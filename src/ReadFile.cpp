@@ -44,6 +44,10 @@ void ReadFile::readFile(string fileName) {
 
 	/* for view point store */
     View* v = new View();
+
+    /* for ployguns storage */
+    vector<Vector> Vectors;
+    vector<Polygun*> polys;
 	this->readFromFile.open(fileName.c_str());
 	string readLines;
 	if(readFromFile.is_open() && !readFromFile.eof()) {
@@ -87,13 +91,6 @@ void ReadFile::readFile(string fileName) {
 					cout << "sphere" << endl;
 
 				} else {
-
-					/*from 1.02285 -3.17715 -2.17451
-					at -0.004103 -0.004103 0.216539
-					up -0.816497 -0.816497 0.816497
-					angle 45
-					hither 1
-					resolution 512 512*/
 					if(readLine == "from") {
 						double x, y, z;
 						iss >> x >> y >> z;
@@ -124,10 +121,46 @@ void ReadFile::readFile(string fileName) {
 						iss >> W >> H;
 						v->setWidth(W);
 						v->setHeight(H);
+					} else if(type == "p" && polySize != 0) {
+						vector<double> value;
+
+						/* in this if condition, the readLine will be the first x value of a polygun */
+						istringstream iss2(readLine);
+						double x;
+						iss2 >> x;
+						value.push_back(x);
+
+						double i;
+						while(iss >> i) {
+							cout << i << " ";
+							value.push_back(i);
+						}
+						cout << endl;
+						/* get the first vector position value*/
+						Vector vec(value[0], value[1], value[2]);
+
+						/* store the polygun's vector value */
+						Vectors.push_back(vec);
+						polySize--;
+
+						/* when the first polygun info is finished reading */
+						if(polySize == 0) {
+
+							/* create new ploygun */
+							Polygun* poly = new Polygun();
+							for(unsigned int j = 0; j < Vectors.size(); j++) {
+								poly->polyEdges.push_back(Vectors[j]);
+							}
+
+							/* store the first polygun to polygun vector */
+							polys.push_back(poly);
+							Vectors.clear();
+						}
 					}
 				}
 			}
 		}
 	}
 	this->worldInfo->setView(v);
+	this->worldInfo->setPolygun(polys);
 }

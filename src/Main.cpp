@@ -57,6 +57,24 @@ int main(int argc, char *argv[]) {
 	fwrite(pixels, 1, H*W*3, file);
 
 	fclose(file);
+
+	vector<Vector> vecs;
+	{
+		Vector vec1(1, 2, 3);
+		Vector vec2;
+		vec2 = vec1.scalar(vec1, 4);
+		vecs.push_back(vec1);
+		vecs.push_back(vec2);
+	}
+
+	cout << "testing polies" << endl;
+	vector<Polygun* > polys = worldInfo->getPolygun();
+	for(unsigned int i = 0; i < polys.size(); i++) {
+		cout << "Polygun " << i + 1 << endl;
+		for(unsigned int j = 0; j < polys[i]->polyEdges.size(); j++) {
+			cout << polys[i]->polyEdges[j] << " ";
+		}
+	}
 	return 0;
 }
 

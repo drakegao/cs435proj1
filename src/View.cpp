@@ -15,6 +15,7 @@ View::View() {
 
 View::~View() {
 	// TODO Auto-generated destructor stub
+	cout << "View is destroyed now" << endl;
 }
 
 void View::setFrom(Vector f) {

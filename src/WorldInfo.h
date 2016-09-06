@@ -11,7 +11,9 @@
 #include "Vector.h"
 #include "View.h"
 #include <cmath>
+#include <vector>
 
+using namespace std;
 /* backgroud color */
 struct Color {
 	double r, g, b;
@@ -21,6 +23,11 @@ struct Color {
 		this->g = floor(r == 1.0 ? 255 : g * 256);
 		this->b = floor(r == 1.0 ? 255 : b * 256);
 	}
+};
+
+/* polygun struct */
+struct Polygun {
+	vector<Vector> polyEdges;
 };
 
 /* fill color */
@@ -43,8 +50,10 @@ public:
 	void setHeight(int h);
 	void setWidth(int w);
 	void setView(View* v);
+	void setPolygun(vector<Polygun* > polyguns);
 	Color getBgColor();
 	FillColor getFillColor();
+	vector<Polygun* > getPolygun();
 	void setBgColor(Color bg);
 	void setFillColor(FillColor fill);
 	virtual ~WorldInfo();
@@ -52,6 +61,7 @@ public:
 private:
 	Color bgColor;
 	FillColor fillColor;
+	vector<Polygun* > polyguns;
 	int hight;
 	int width;
 	View* view;

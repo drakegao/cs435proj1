@@ -7,6 +7,7 @@
 
 #include "WorldInfo.h"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 WorldInfo::WorldInfo() {
@@ -17,6 +18,9 @@ WorldInfo::WorldInfo() {
 WorldInfo::~WorldInfo() {
 	// TODO Auto-generated destructor stub
 	std::cout << "worldInfo is gone" << endl;
+	for(int i = 0; i < polyguns.size(); i++) {
+		delete polyguns[i];
+	}
 	if(view != NULL) {
 		delete view;
 	}
@@ -46,6 +50,10 @@ int WorldInfo::getWidth() {
 	return this->width;
 }
 
+vector<Polygun* > WorldInfo::getPolygun() {
+	return this->polyguns;
+}
+
 void WorldInfo::setHeight(int h) {
 	this->hight = h;
 }
@@ -60,4 +68,8 @@ void WorldInfo::setBgColor(Color bg) {
 
 void WorldInfo::setFillColor(FillColor fill) {
 	this->fillColor = fill;
+}
+
+void WorldInfo::setPolygun(vector<Polygun* > polyguns) {
+	this->polyguns = polyguns;
 }

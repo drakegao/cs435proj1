@@ -46,6 +46,24 @@ Vector operator - (const Vector &i, const Vector &j) {
 	return Vector(i.x - j.x, i.y - j.y, i.z - j.z);
 }
 
+/**
+ * for vector addition
+ */
+Vector operator + (const Vector &i, const Vector &j) {
+	return Vector(i.x + j.x, i.y + j.y, i.z + j.z);
+}
+
+/*
+ * for scalar vector
+ */
+Vector Vector::scalar (const Vector &i, double d) {
+	double x = i.x * d;
+	double y = i.y * d;
+	double z = i.z * d;
+	Vector newVec(x, y, z);
+	return newVec;
+}
+
 void Vector::operator = (const Vector &rhs) {
 	this->x = rhs.x;
 	this->y = rhs.y;
