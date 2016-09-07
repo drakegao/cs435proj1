@@ -9,7 +9,20 @@
 #include <iostream>
 #include "ReadFile.h"
 
+#define PI 3.14159265
+
+
 using namespace std;
+/* cross, AxB = [Ay*Bz + Az*By, Az*Bx + Ax*Bz, Ax*By + Ay*Bx]
+ * piont intersection: (p-p0)⋅n=0,l0+l∗t=p
+ * t=−(l0−p0)⋅/nl⋅n=(p0-l0)⋅/nl⋅n
+ * */
+struct Ray {
+	// origin
+	Vector origin;
+	Vector direction;
+	// direction
+};
 
 int main(int argc, char *argv[]) {
 	cout << argc << " " << argv[0] << endl;
@@ -17,16 +30,16 @@ int main(int argc, char *argv[]) {
 	readFile.readFile("tetra-3.nff");
 	//readFile.readFile(argv[1]);
 	WorldInfo* worldInfo = readFile.getWorldInfo();
-
+	vector<Polygun*> polyguns = worldInfo->getPolygun();
 
 	/* for testing view value */
 	View* view = worldInfo->getViewPoint();
-	cout << "FromVec in main: " << view->getFrom() << endl;
+	/*cout << "FromVec in main: " << view->getFrom() << endl;
 	cout << "AtVec in main: " << view->getAt() << endl;
 	cout << "UpVec in main: " << view->getUp() << endl;
 	cout << "Angle in main: " << view->getAngle() << endl;
 	cout << "Hither in main: " << view->getHither() << endl;
-	cout << "Res in main: " << view->getWidth() << " " << view->getHeight() << endl;
+	cout << "Res in main: " << view->getWidth() << " " << view->getHeight() << endl;*/
 
 	int H, W;
 	H = view->getHeight();
@@ -40,15 +53,51 @@ int main(int argc, char *argv[]) {
 	fwrite("255", 1, 4, file);
 
 	Color bgColor = worldInfo->getBgColor();
-	cout << "BgColor in main: " << bgColor.r << " " << bgColor.g << " " << bgColor.b << endl;
 
 	unsigned char pixels[H][W][3];
 
+	/**
+	 * get coordinates vectors from Eye;
+	 */
+	Vector eye = view->getFrom();
+	Vector up = view->getUp();
+	Vector at = view->getAt();
+	Vector vecW = worldInfo->getW(eye, at);
+	Vector vecU = worldInfo->getV(vecW, up);
+	Vector vecV = worldInfo->getV(vecW, vecU);
+	/* get unit vectors */
+	vecW = vecW.getUnit(vecW);
+	vecU = vecU.getUnit(vecU);
+	vecV = vecV.getUnit(vecV);
 
-	cout << H << " " << W << endl;
+	/* get angle and distance */
+	int angle = view->getAngle();
+	Vector toCOI = worldInfo->getDistToCOI();
+	double unitToCOI = toCOI.getLength();
+	double distToCOI = tan((angle / 2) * (PI / 180)) * unitToCOI;
+	double left = -distToCOI;
+	double bottom = -distToCOI;
+	double right = distToCOI;
+	double top = distToCOI;
 
-	for(int h = 0; h < H; h++) {
-		for(int w = 0; w < W; w++) {
+
+	/* get ray */
+	for(int h = 0; h < 3; h++) {
+		for(int w = 0; w < 3; w++) {
+			/* get scaler, set j: in H dir, i: in W dir*/
+			double S = ((h + 0.5) / H) * (right - left) - distToCOI;
+			double C = ((w + 0.5) / W) * (top - bottom) - distToCOI;
+			Vector scalerU = vecU.scalar(vecV, S);
+			Vector scalerV = vecV.scalar(vecV, C);
+			Vector scalerW = vecW.scalar(vecW, unitToCOI);
+
+			/* get direction ray */
+			Vector dir = scalerU + scalerV - scalerW - eye;
+
+			/* loop through objs */
+
+
+			/* get ray dir */
 			pixels[h][w][0] = bgColor.r;
 			pixels[h][w][1] = bgColor.g;
 			pixels[h][w][2] = bgColor.b;
@@ -58,23 +107,28 @@ int main(int argc, char *argv[]) {
 
 	fclose(file);
 
-	vector<Vector> vecs;
-	{
-		Vector vec1(1, 2, 3);
-		Vector vec2;
-		vec2 = vec1.scalar(vec1, 4);
-		vecs.push_back(vec1);
-		vecs.push_back(vec2);
-	}
+	/* testing vector operators */
+	Vector v(1,1,1);
 
-	cout << "testing polies" << endl;
-	vector<Polygun* > polys = worldInfo->getPolygun();
-	for(unsigned int i = 0; i < polys.size(); i++) {
-		cout << "Polygun " << i + 1 << endl;
-		for(unsigned int j = 0; j < polys[i]->polyEdges.size(); j++) {
-			cout << polys[i]->polyEdges[j] << " ";
-		}
-	}
+/*	Vector eye = view->getFrom();
+	Vector up = view->getUp();
+	Vector at = view->getAt();
+	Vector vecW = worldInfo->getW(eye, at);
+	Vector vecU = worldInfo->getV(vecW, up);
+	Vector vecV = worldInfo->getV(vecW, vecU);
+	 get unit vector
+	vecW = vecW.getUnit(vecW);
+	vecU = vecU.getUnit(vecU);
+	vecV = vecV.getUnit(vecV);
+	cout << "vec2: " << vec2 << endl;
+	cout << "vecW: " << vecW << endl;
+	cout << "vecU: " << vecU << endl;
+	cout << "vecV: " << vecV << endl;
+	cout << "len: " << dist2 << endl;
+	Vector v2 = v.scalar(v, 3);
+	cout << v2 << endl;
+	*/
+
 	return 0;
 }
 

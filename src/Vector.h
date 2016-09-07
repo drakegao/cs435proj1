@@ -15,10 +15,13 @@ public:
 	Vector();
 	Vector(double, double, double);
 	double dot(Vector i, Vector j);
-	Vector cross(Vector i, Vector j); // do i need this?
+	Vector cross(Vector j); // do i need this?
 	friend Vector operator - (const Vector &i, const Vector &j);
 	friend Vector operator + (const Vector &i, const Vector &j);
+	Vector VecDivision (const Vector &i, double t);
+	Vector getUnit(Vector i);
 	Vector scalar (const Vector &i, double d);
+	double getLength();
 	void operator = (const Vector &rhs);
 	double getX();
 	double getY();

@@ -7,6 +7,7 @@
 
 #include "Vector.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 Vector::Vector() {
@@ -41,9 +42,18 @@ Vector::~Vector() {
 	// TODO Auto-generated destructor stub
 }
 
-// vector subtraction
-Vector operator - (const Vector &i, const Vector &j) {
-	return Vector(i.x - j.x, i.y - j.y, i.z - j.z);
+
+/**
+ * get length
+ */
+double Vector::getLength() {
+	double x, y, z;
+	x = this->x;
+	y = this->y;
+	z = this->z;
+	double distSqr = pow(x, 2) + pow(y, 2) + pow(z, 2);
+	double length = std::sqrt(distSqr);
+	return length;
 }
 
 /**
@@ -51,6 +61,32 @@ Vector operator - (const Vector &i, const Vector &j) {
  */
 Vector operator + (const Vector &i, const Vector &j) {
 	return Vector(i.x + j.x, i.y + j.y, i.z + j.z);
+}
+
+// vector subtraction
+Vector operator - (const Vector &i, const Vector &j) {
+	return Vector(i.x - j.x, i.y - j.y, i.z - j.z);
+}
+
+/**
+ * for vector division
+ */
+Vector Vector::VecDivision(const Vector &i, double t) {
+	double u, v, w;
+	u = i.x / t;
+	v = i.y / t;
+	w = i.z / t;
+	return Vector(u, v, w);
+}
+
+/**
+ * get unit vector
+ */
+Vector Vector::getUnit(Vector i) {
+
+	double length = i.getLength();
+	Vector unitW = i.VecDivision(i, length);
+	return unitW;
 }
 
 /*
@@ -63,6 +99,17 @@ Vector Vector::scalar (const Vector &i, double d) {
 	Vector newVec(x, y, z);
 	return newVec;
 }
+
+/**
+ * for cross product
+ */
+Vector Vector::cross(Vector j) {
+	double x, y, z;
+	x = this->getY() * j.getZ() - this->getZ() * j.getY();
+	y = this->getZ() * j.getX() - this->getX() * j.getZ();
+	z = this->getX() * j.getY() - this->getY() * j.getX();
+	return Vector(x, y, z);
+ }
 
 void Vector::operator = (const Vector &rhs) {
 	this->x = rhs.x;

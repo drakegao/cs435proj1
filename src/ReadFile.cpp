@@ -51,8 +51,6 @@ void ReadFile::readFile(string fileName) {
 	this->readFromFile.open(fileName.c_str());
 	string readLines;
 	if(readFromFile.is_open() && !readFromFile.eof()) {
-		int pCount = 0;
-
 		/* so far it will recognize 'bvfps' command*/
 		while(getline(readFromFile, readLines)) {
 			istringstream iss(readLines);
@@ -132,10 +130,9 @@ void ReadFile::readFile(string fileName) {
 
 						double i;
 						while(iss >> i) {
-							cout << i << " ";
 							value.push_back(i);
 						}
-						cout << endl;
+
 						/* get the first vector position value*/
 						Vector vec(value[0], value[1], value[2]);
 
@@ -149,6 +146,7 @@ void ReadFile::readFile(string fileName) {
 							/* create new ploygun */
 							Polygun* poly = new Polygun();
 							for(unsigned int j = 0; j < Vectors.size(); j++) {
+								/* Vectors[..] will be copied to Polygun's vector<Vectors> */
 								poly->polyEdges.push_back(Vectors[j]);
 							}
 
@@ -162,5 +160,5 @@ void ReadFile::readFile(string fileName) {
 		}
 	}
 	this->worldInfo->setView(v);
-	this->worldInfo->setPolygun(polys);
+	this->worldInfo->setPolygun(polys); // get all polyguns
 }
