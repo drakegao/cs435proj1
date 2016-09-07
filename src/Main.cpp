@@ -10,6 +10,16 @@
 #include "ReadFile.h"
 
 using namespace std;
+/* cross, AxB = [Ay*Bz + Az*By, Az*Bx + Ax*Bz, Ax*By + Ay*Bx]
+ * piont intersection: (p-p0)⋅n=0,l0+l∗t=p
+ * t=−(l0−p0)⋅/nl⋅n=(p0-l0)⋅/nl⋅n
+ * */
+struct Ray {
+	// origin
+	Vector origin;
+	Vector direction;
+	// direction
+};
 
 int main(int argc, char *argv[]) {
 	cout << argc << " " << argv[0] << endl;

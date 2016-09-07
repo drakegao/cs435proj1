@@ -26,6 +26,13 @@ WorldInfo::~WorldInfo() {
 	}
 }
 
+/**
+ * get the W vector: eye - lookat
+ */
+Vector WorldInfo::getW(const Vector& from, const Vector& at) {
+	double x, y, z;
+}
+
 View* WorldInfo::getViewPoint() {
 	return view;
 }

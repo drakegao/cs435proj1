@@ -54,6 +54,9 @@ public:
 	Color getBgColor();
 	FillColor getFillColor();
 	vector<Polygun* > getPolygun();
+
+	/* get v, u, w origin from eye */
+	Vector getW(const Vector& from, const Vector& at);
 	void setBgColor(Color bg);
 	void setFillColor(FillColor fill);
 	virtual ~WorldInfo();

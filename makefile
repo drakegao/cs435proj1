@@ -25,4 +25,4 @@ clean:
 	rm *.o* results.txt
 
 run:
-	./Main.out $(FILENAME)
+	./Main.out $(STORE) $(ORDERS)
