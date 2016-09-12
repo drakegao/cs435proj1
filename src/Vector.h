@@ -21,6 +21,7 @@ public:
 	Vector VecDivision (const Vector &i, double t);
 	Vector getUnit(Vector i);
 	Vector scalar (const Vector &i, double d);
+	double getXYZbyIndex(int index);
 	double getLength();
 	void operator = (const Vector &rhs);
 	double getX();

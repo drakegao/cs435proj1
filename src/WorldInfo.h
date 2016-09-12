@@ -20,14 +20,26 @@ struct Color {
 	Color(){r = g = b =0;}
 	Color(double r, double g, double b) {
 		this->r = floor(r == 1.0 ? 255 : r * 256);
-		this->g = floor(r == 1.0 ? 255 : g * 256);
-		this->b = floor(r == 1.0 ? 255 : b * 256);
+		this->g = floor(g == 1.0 ? 255 : g * 256);
+		this->b = floor(b == 1.0 ? 255 : b * 256);
 	}
 };
 
 /* polygun struct */
 struct Polygun {
 	vector<Vector> polyEdges;
+};
+
+struct Ray {
+	// origin
+	Vector origin;
+	Vector direction;
+	// direction
+
+	Ray(Vector o, Vector d) {
+		origin = o;
+		direction = d;
+	}
 };
 
 /* fill color */
@@ -37,7 +49,11 @@ struct FillColor {
 		r = g = b = kd = ks = shine = T = 0;
 	}
 	FillColor(double r, double g, double b, double kd, double ks, double shine, double T) {
-		this->r = r; this->g = g; this->b = b; this->kd = kd; this->ks = ks; this->shine = shine; this->T = T;
+		this->r = floor(r == 1.0 ? 255 : r * 256);
+		this->g = floor(g == 1.0 ? 255 : g * 256);
+		this->b = floor(b == 1.0 ? 255 : b * 256);
+
+		this->kd = kd; this->ks = ks; this->shine = shine; this->T = T;
 	}
 };
 
@@ -60,7 +76,7 @@ public:
 	Vector getU(Vector W, Vector up);
 	Vector getV(Vector W, Vector U);
 	Vector getDistToCOI();
-	vector<Vector> getMatrix(Polygun p, Vector dir);
+	bool isIntersect(Polygun* p, Ray r);
 	void setBgColor(Color bg);
 	void setFillColor(FillColor fill);
 	virtual ~WorldInfo();

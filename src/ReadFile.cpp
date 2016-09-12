@@ -84,6 +84,8 @@ void ReadFile::readFile(string fileName) {
 					double r, g, b, kd, ks, shine, T;
 					iss >> r >> g >> b >> kd >> ks >> shine >> T;
 					// store fillColor here
+					FillColor fillColor(r, g, b, kd, ks, shine, T);
+					this->worldInfo->setFillColor(fillColor);
 
 				} else if(readLine == "s") {
 					cout << "sphere" << endl;

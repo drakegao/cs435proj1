@@ -33,6 +33,18 @@ double Vector::getZ() {
 	return this->z;
 }
 
+double Vector::getXYZbyIndex(int index) {
+	if(index == 0) {
+		return this->getX();
+	} else if(index == 1) {
+		return this->getY();
+	} else if(index == 2){
+		return this->getZ();
+	} else {
+		return 0.0;
+	}
+}
+
 // return a dot product
 double Vector::dot(Vector i, Vector j) {
 	return (i.getX() * j.getX() + i.getY() * j.getY() + i.getZ() * i.getZ());
