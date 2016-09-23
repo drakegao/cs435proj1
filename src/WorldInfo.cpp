@@ -198,28 +198,9 @@ Color WorldInfo::trace(Ray ray) {
 	}
 	Color color(0, 0, 0);
 	if(P) {
-		/* compute lambert shade
-		Vector I = this->light.light - pHit;
-		Vector normal = normal.getUnit(sNormal);
-		I = I.getUnit(I);
-		double inormalDot = I.dot(I, normal);
-		double intensity = 1 / sqrt(2);
-		double lambertValue = this->fillColor.kd * intensity * max((double)0, inormalDot);
-
-		 compute bling
-		Vector view = ray.origin - pHit;
-		Vector half = view.cross(I);
-		view = view.getUnit(view);
-		half = half.getUnit(half);
-
-		 compute ambient
-
-		double hNormalDot = half.dot(half, normal);
-		double blingValue = this->fillColor.ks * intensity * pow(max((double)0, hNormalDot), this->fillColor.shine);*/
-
-		double r = P->fillColor.r;// * (lambertValue + blingValue) + this->fillColor.T;
-		double g = P->fillColor.g;// * (lambertValue + blingValue) + this->fillColor.T;
-		double b = P->fillColor.b;// * (lambertValue + blingValue) + this->fillColor.T;
+		double r = P->fillColor.r;
+		double g = P->fillColor.g;
+		double b = P->fillColor.b;
 
 		color.r = floor(r == 1.0 ? 255 : r * 256);
 		color.g = floor(g == 1.0 ? 255 : g * 256);
