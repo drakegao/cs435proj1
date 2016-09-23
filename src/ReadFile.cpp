@@ -63,6 +63,13 @@ void ReadFile::readFile(string fileName) {
 				if(readLine == "v") {
 					type = "v";
 
+				} else if(readLine == "l") {
+					double x, y, z;
+					iss >> x >> y >> z;
+					Vector lightPos(x, y, z);
+					Light light(lightPos);
+					this->worldInfo->light = light;
+
 				} else if(readLine == "b") {
 					type = "b";
 
@@ -80,17 +87,22 @@ void ReadFile::readFile(string fileName) {
 
 					/* set poly numbers */
 
+				} else if(readLine == "pp") {
+					type = "pp";
+					iss >> polySize;
+
 				} else if(readLine == "f") {
-					double r, g, b, kd, ks, shine, T;
-					iss >> r >> g >> b >> kd >> ks >> shine >> T;
+					double r, g, b, kd, ks, shine, T, index;
+					iss >> r >> g >> b >> kd >> ks >> shine >> T >> index;
 					// store fillColor here
-					FillColor fillColor(r, g, b, kd, ks, shine, T);
+					FillColor fillColor(r, g, b, kd, ks, shine, T, index);
 					this->worldInfo->setFillColor(fillColor);
 
 				} else if(readLine == "s") {
 					cout << "sphere" << endl;
 
 				} else {
+
 					if(readLine == "from") {
 						double x, y, z;
 						iss >> x >> y >> z;
@@ -129,13 +141,12 @@ void ReadFile::readFile(string fileName) {
 						double x;
 						iss2 >> x;
 						value.push_back(x);
-
 						double i;
 						while(iss >> i) {
 							value.push_back(i);
 						}
 
-						/* get the first vector position value*/
+						/* get the first vector position value */
 						Vector vec(value[0], value[1], value[2]);
 
 						/* store the polygun's vector value */
@@ -146,14 +157,80 @@ void ReadFile::readFile(string fileName) {
 						if(polySize == 0) {
 
 							/* create new ploygun */
-							Polygun* poly = new Polygun();
-							for(unsigned int j = 0; j < Vectors.size(); j++) {
-								/* Vectors[..] will be copied to Polygun's vector<Vectors> */
-								poly->polyEdges.push_back(Vectors[j]);
+							unsigned int size = Vectors.size();
+							if(size == 3) {
+								Polygun* poly = new Polygun();
+								for(unsigned int j = 0; j < size; j++) {
+									/* Vectors[..] will be copied to Polygun's vector<Vectors> */
+									poly->polyEdges.push_back(Vectors[j]);
+									poly->fillColor = this->worldInfo->getFillColor();
+								}
+
+								/* store the first polygun to polygun vector */
+								polys.push_back(poly);
+							} else if(size > 3) {
+
+								/* fan out polyguns into triangles */
+								for(unsigned int k = 1; k < size - 1; k++) {
+									Polygun* poly = new Polygun();
+									poly->polyEdges.push_back(Vectors[0]);
+									poly->polyEdges.push_back(Vectors[k]);
+									poly->polyEdges.push_back(Vectors[k + 1]);
+									poly->fillColor = this->worldInfo->getFillColor();
+									polys.push_back(poly);
+								}
 							}
 
-							/* store the first polygun to polygun vector */
-							polys.push_back(poly);
+							Vectors.clear();
+						}
+					} else if(type == "pp" && polySize != 0) {
+						double x, y, z, xN, yN, zN;
+
+						vector<double> value;
+
+						/* in this if condition, the readLine will be the first x value of a polygun */
+						istringstream iss2(readLine);
+
+						iss2 >> x;
+						iss >> y >> z >> xN >> yN >> zN;
+						value.push_back(x);
+
+
+						/* get the first vector position value */
+						Vector vec(x, y, z, xN, yN, zN);
+
+						/* store the polygun's vector value */
+						Vectors.push_back(vec);
+						polySize--;
+
+						/* when the first polygun info is finished reading */
+						if(polySize == 0) {
+
+							/* create new ploygun */
+							unsigned int size = Vectors.size();
+							if(size == 3) {
+								Polygun* poly = new Polygun();
+								for(unsigned int j = 0; j < size; j++) {
+									/* Vectors[..] will be copied to Polygun's vector<Vectors> */
+									poly->polyEdges.push_back(Vectors[j]);
+									poly->fillColor = this->worldInfo->getFillColor();
+								}
+
+								/* store the first polygun to polygun vector */
+								polys.push_back(poly);
+							} else if(size > 3) {
+
+								/* fan out polyguns into triangles */
+								for(unsigned int k = 1; k < size - 1; k++) {
+									Polygun* poly = new Polygun();
+									poly->polyEdges.push_back(Vectors[0]);
+									poly->polyEdges.push_back(Vectors[k]);
+									poly->polyEdges.push_back(Vectors[k + 1]);
+									poly->fillColor = this->worldInfo->getFillColor();
+									polys.push_back(poly);
+								}
+							}
+
 							Vectors.clear();
 						}
 					}

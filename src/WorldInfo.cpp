@@ -40,6 +40,7 @@ Vector WorldInfo::getU(Vector W, Vector Up) {
 }
 
 Vector WorldInfo::getV(Vector W, Vector U) {
+
 	Vector V = W.cross(U);
 	return V;
 }
@@ -77,10 +78,18 @@ vector<Polygun* > WorldInfo::getPolygun() {
 	return this->polyguns;
 }
 
+int WorldInfo::getSize() {
+	return this->size;
+}
+
+void WorldInfo::setSize(int size) {
+	this->size = size;
+}
+
 /**
- * get matrix
+ * detecting intersect
  */
-bool WorldInfo::isIntersect(Polygun* p, Ray ray) {
+bool WorldInfo::isIntersect(Polygun* p, Ray ray, Vector& pHit, Vector& sNormal) {
 
 	Vector ev0 = p->polyEdges[0] - ray.origin;
 	double distVec[3] = {0};
@@ -113,14 +122,18 @@ bool WorldInfo::isIntersect(Polygun* p, Ray ray) {
 	 * 3, inverse of Matrix multiply ev0 vector
 	 * 4, determine is ray intersects (0 < x < 1, 0 < y < 1; 0 < x + y < 1, t > 0)
 	 */
+
+	/* determinant */
 	double det = 0;
 	for(int i = 0; i < 3; i++) {
 		det += matrix[0][i] * (matrix[1][(i+1) % 3] * matrix[2][(i+2) % 3] - matrix[1][(i+2) % 3] * matrix[2][(i+1) % 3]);
 	}
+
 	if(det == 0) {
 		return false;
 	}
-	// inverse matrix
+
+	/* inverse matrix */
 	double matrixT[3][3] = {0};
 	for(int i = 0; i < 3; i++) {
 		for(int j = 0; j < 3; j++) {
@@ -134,16 +147,22 @@ bool WorldInfo::isIntersect(Polygun* p, Ray ray) {
 		res[i] = matrixT[i][0] *  distVec[0] + matrixT[i][1] * distVec[1] + matrixT[i][2] * distVec[2];
 	}
 
-
 	double alpha, beta, t;
 
 	alpha = res[0];
 	beta = res[1];
 	t = res[2];
+	if(t < 0) {
+		return false;
+	}
 
-	//cout << "alpha: " << alpha << " beta: " << beta << " t: " << t << endl;
 	bool isIntersect;
 	if((alpha > 0 && alpha < 1) && (beta > 0 && beta < 1 - alpha) && t > 0) {
+		Vector scalarV = scalarV.scalar(ray.direction, t);
+		pHit = ray.origin + scalarV;
+
+		/* get the surface normal of this polygun */
+		sNormal = v0v1.cross(v0v2);
 		isIntersect = true;
 	} else {
 		isIntersect = false;
@@ -151,6 +170,67 @@ bool WorldInfo::isIntersect(Polygun* p, Ray ray) {
 
 	return isIntersect;
 
+}
+
+Color WorldInfo::trace(Ray ray) {
+	/* get the hit point */
+	Vector pHit(0, 0, 0);
+	Vector sNormal(0, 0, 0);
+	Polygun* P = 0;
+	double closestHit = 9999;
+
+	for(unsigned int k = 0; k < polyguns.size(); k++) {
+		bool touch = false;
+		// testing every polygun in current pixel
+		Polygun* p = polyguns[k];
+		touch = isIntersect(p, ray, pHit, sNormal);
+
+		if(touch) {
+			double dist = pHit.getLength();
+			if(dist < closestHit) {
+				closestHit = dist;
+				P = p;
+				/* for the proj1 only */
+				break;
+			}
+
+		}
+	}
+	Color color(0, 0, 0);
+	if(P) {
+		/* compute lambert shade
+		Vector I = this->light.light - pHit;
+		Vector normal = normal.getUnit(sNormal);
+		I = I.getUnit(I);
+		double inormalDot = I.dot(I, normal);
+		double intensity = 1 / sqrt(2);
+		double lambertValue = this->fillColor.kd * intensity * max((double)0, inormalDot);
+
+		 compute bling
+		Vector view = ray.origin - pHit;
+		Vector half = view.cross(I);
+		view = view.getUnit(view);
+		half = half.getUnit(half);
+
+		 compute ambient
+
+		double hNormalDot = half.dot(half, normal);
+		double blingValue = this->fillColor.ks * intensity * pow(max((double)0, hNormalDot), this->fillColor.shine);*/
+
+		double r = P->fillColor.r;// * (lambertValue + blingValue) + this->fillColor.T;
+		double g = P->fillColor.g;// * (lambertValue + blingValue) + this->fillColor.T;
+		double b = P->fillColor.b;// * (lambertValue + blingValue) + this->fillColor.T;
+
+		color.r = floor(r == 1.0 ? 255 : r * 256);
+		color.g = floor(g == 1.0 ? 255 : g * 256);
+		color.b = floor(b == 1.0 ? 255 : b * 256);
+
+	} else {
+		color.r = floor(this->bgColor.r == 1.0 ? 255 : this->bgColor.r * 256);
+		color.g = floor(this->bgColor.g == 1.0 ? 255 : this->bgColor.g * 256);
+		color.b = floor(this->bgColor.b == 1.0 ? 255 : this->bgColor.b * 256);
+	}
+	return color;
 }
 
 void WorldInfo::setHeight(int h) {
@@ -172,46 +252,3 @@ void WorldInfo::setFillColor(FillColor fill) {
 void WorldInfo::setPolygun(vector<Polygun* > polyguns) {
 	this->polyguns = polyguns;
 }
-
-
-// other code
-/*
-Vector v1v0 = p->polyEdges[1] - p->polyEdges[0];
-Vector v2v0 = p->polyEdges[2] - p->polyEdges[0];
-Vector N = v1v0.cross(v2v0);
-double Nlen = N.getLength();
-
-double NtoRayDir = N.dot(N, ray.direction);
-if(NtoRayDir < 0.000000001) {
-	return false;
-}
-double d = N.dot(N, p->polyEdges[0]);
-double t = (N.dot(N,ray.origin) + d);
-if(t < 0) {
-	return false;
-}
-Vector dd = dd.scalar(ray.direction, t);
-Vector P = ray.origin + dd;
-
-Vector C;
-Vector edge0 = p->polyEdges[1] - p->polyEdges[0];
-Vector edge1 = p->polyEdges[2] - p->polyEdges[1];
-Vector edge2 = p->polyEdges[0] - p->polyEdges[2];
-Vector vp0 = P - p->polyEdges[0];
-Vector vp1 = P - p->polyEdges[1];
-Vector vp2 = P - p->polyEdges[2];
-C = edge0.cross(vp0);
-if(N.dot(N, C) < 0) {
-	return false;
-}
-
-C = edge1.cross(vp1);
-if(N.dot(N, C) < 0) {
-	return false;
-}
-C = edge2.cross(vp2);
-if(N.dot(N, C) < 0) {
-	return false;
-}
-return true;
-*/

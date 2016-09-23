@@ -14,6 +14,7 @@ class Vector {
 public:
 	Vector();
 	Vector(double, double, double);
+	Vector(double, double, double, double, double, double);
 	double dot(Vector i, Vector j);
 	Vector cross(Vector j); // do i need this?
 	friend Vector operator - (const Vector &i, const Vector &j);
@@ -27,12 +28,24 @@ public:
 	double getX();
 	double getY();
 	double getZ();
+	void setX(double);
+	void setY(double);
+	void setZ(double);
+	double getXN();
+	double getYN();
+	double getZN();
+	void setXN(double);
+	void setYN(double);
+	void setZN(double);
 
 	virtual ~Vector();
 private:
 	double x;
 	double y;
 	double z;
+	double xn;
+	double yn;
+	double zn;
 };
 
 std::ostream &operator << (std::ostream& sout, const Vector &myVector);

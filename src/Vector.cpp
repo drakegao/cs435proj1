@@ -21,6 +21,38 @@ Vector::Vector(double x, double y, double z) {
 	this->z = z;
 }
 
+Vector::Vector(double x, double y, double z, double xn, double yn, double zn) {
+	this->x = x;
+	this->y = y;
+	this->z = z;
+	this->xn = xn;
+	this->yn = yn;
+	this->zn = zn;
+}
+
+double Vector::getXN() {
+	return this->xn;
+}
+
+double Vector::getYN() {
+	return this->yn;
+}
+
+double Vector::getZN() {
+	return this->zn;
+}
+
+void Vector::setXN(double xn) {
+	this->xn = xn;
+}
+
+void Vector::setYN(double yn) {
+	this->yn = yn;
+}
+void Vector::setZN(double zn) {
+	this->zn = zn;
+}
+
 double Vector::getX() {
 	return this->x;
 }
@@ -127,6 +159,18 @@ void Vector::operator = (const Vector &rhs) {
 	this->x = rhs.x;
 	this->y = rhs.y;
 	this->z = rhs.z;
+}
+
+void Vector::setX(double x) {
+	this->x = x;
+}
+
+void Vector::setY(double y) {
+	this->y = y;
+}
+
+void Vector::setZ(double z) {
+	this->z = z;
 }
 
 ostream & operator << (ostream& sout, const Vector &vec) {
